@@ -82,6 +82,11 @@ describe 'kmod' do
   # Containers share the host kernel and can't load modules, so use one the
   # host already has loaded (overlay backs Docker's storage driver).
   context 'with kmod::load' do
+    # EL ships /etc/modules-load.d in systemd-udev, which the container images omit.
+    before(:all) do
+      install_package(default, 'systemd-udev') if fact('os.family') == 'RedHat'
+    end
+
     it_behaves_like 'an idempotent resource' do
       let(:manifest) { "kmod::load { 'overlay': }" }
     end
